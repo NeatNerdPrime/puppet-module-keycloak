@@ -229,6 +229,7 @@ describe 'keycloak_realm:', if: RSpec.configuration.keycloak_full do
         otp_policy_digits                 => 8,
         otp_policy_period                 => 30,
         otp_policy_code_reusable          => true,
+        password_policy                   => 'length(12) and notUsername(undefined) and notEmail(undefined) and forceExpiredPasswordChange(365) and hashIterations(27500) and passwordHistory(3) and specialChars(1) and upperCase(1) and lowerCase(1) and digits(1) and maxLength(64)',
         web_authn_policy_rp_entity_name                    => 'Keycloak',
         web_authn_policy_signature_algorithms              => ['ES256', 'ES384', 'ES512', 'RS256', 'RS384', 'RS512'],
         web_authn_policy_rp_id                             => 'https://example.com',
@@ -239,6 +240,7 @@ describe 'keycloak_realm:', if: RSpec.configuration.keycloak_full do
         web_authn_policy_create_timeout                    => 600,
         web_authn_policy_avoid_same_authenticator_register => true,
         web_authn_policy_acceptable_aaguids                => ['d1d1d1d1-d1d1-d1d1-d1d1-d1d1d1d1d1d1'],
+        web_authn_policy_extra_origins                     => ['https://example.com'],
         web_authn_policy_passwordless_rp_entity_name                    => 'Keycloak',
         web_authn_policy_passwordless_signature_algorithms              => ['ES256', 'ES384', 'ES512', 'RS256', 'RS384', 'RS512'],
         web_authn_policy_passwordless_rp_id                             => 'https://example.com',
@@ -249,6 +251,7 @@ describe 'keycloak_realm:', if: RSpec.configuration.keycloak_full do
         web_authn_policy_passwordless_create_timeout                    => 600,
         web_authn_policy_passwordless_avoid_same_authenticator_register => true,
         web_authn_policy_passwordless_acceptable_aaguids                => ['d1d1d1d1-d1d1-d1d1-d1d1-d1d1d1d1d1d1'],
+        web_authn_policy_passwordless_extra_origins                     => ['https://example.com'],
       }
       PUPPET_PP
 
@@ -258,6 +261,20 @@ describe 'keycloak_realm:', if: RSpec.configuration.keycloak_full do
 
     it 'has updated the realm' do
       on hosts, '/opt/keycloak/bin/kcadm-wrapper.sh get realms/test' do
+        password_policy_value = [
+          'length(12)',
+          'notUsername(undefined)',
+          'notEmail(undefined)',
+          'forceExpiredPasswordChange(365)',
+          'hashIterations(27500)',
+          'passwordHistory(3)',
+          'specialChars(1)',
+          'upperCase(1)',
+          'lowerCase(1)',
+          'digits(1)',
+          'maxLength(64)'
+        ]
+
         data = JSON.parse(stdout)
         expect(data['rememberMe']).to eq(true)
         expect(data['registrationAllowed']).to eq(true)
@@ -311,6 +328,7 @@ describe 'keycloak_realm:', if: RSpec.configuration.keycloak_full do
         expect(data['otpPolicyDigits']).to eq(8)
         expect(data['otpPolicyPeriod']).to eq(30)
         expect(data['otpPolicyCodeReusable']).to eq(true)
+        expect(data['passwordPolicy']).to eq(password_policy_value.join(' and '))
         expect(data['webAuthnPolicyRpEntityName']).to eq('Keycloak')
         expect(data['webAuthnPolicySignatureAlgorithms']).to eq(['ES256', 'ES384', 'ES512', 'RS256', 'RS384', 'RS512'])
         expect(data['webAuthnPolicyRpId']).to eq('https://example.com')
@@ -321,6 +339,7 @@ describe 'keycloak_realm:', if: RSpec.configuration.keycloak_full do
         expect(data['webAuthnPolicyCreateTimeout']).to eq(600)
         expect(data['webAuthnPolicyAvoidSameAuthenticatorRegister']).to eq(true)
         expect(data['webAuthnPolicyAcceptableAaguids']).to eq(['d1d1d1d1-d1d1-d1d1-d1d1-d1d1d1d1d1d1'])
+        expect(data['webAuthnPolicyExtraOrigins']).to eq(['https://example.com'])
         expect(data['webAuthnPolicyPasswordlessRpEntityName']).to eq('Keycloak')
         expect(data['webAuthnPolicyPasswordlessSignatureAlgorithms']).to eq(['ES256', 'ES384', 'ES512', 'RS256', 'RS384', 'RS512'])
         expect(data['webAuthnPolicyPasswordlessRpId']).to eq('https://example.com')
@@ -331,6 +350,7 @@ describe 'keycloak_realm:', if: RSpec.configuration.keycloak_full do
         expect(data['webAuthnPolicyPasswordlessCreateTimeout']).to eq(600)
         expect(data['webAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister']).to eq(true)
         expect(data['webAuthnPolicyPasswordlessAcceptableAaguids']).to eq(['d1d1d1d1-d1d1-d1d1-d1d1-d1d1d1d1d1d1'])
+        expect(data['webAuthnPolicyPasswordlessExtraOrigins']).to eq(['https://example.com'])
       end
     end
 

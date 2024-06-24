@@ -82,6 +82,7 @@ describe Puppet::Type.type(:keycloak_realm) do
     web_authn_policy_create_timeout: 0,
     web_authn_policy_avoid_same_authenticator_register: :false,
     web_authn_policy_acceptable_aaguids: [],
+    web_authn_policy_extra_origins: [],
     web_authn_policy_passwordless_rp_entity_name: 'keycloak',
     web_authn_policy_passwordless_signature_algorithms: ['ES256'],
     web_authn_policy_passwordless_rp_id: '',
@@ -91,7 +92,8 @@ describe Puppet::Type.type(:keycloak_realm) do
     web_authn_policy_passwordless_user_verification_requirement: 'not specified',
     web_authn_policy_passwordless_create_timeout: 0,
     web_authn_policy_passwordless_avoid_same_authenticator_register: :false,
-    web_authn_policy_passwordless_acceptable_aaguids: []
+    web_authn_policy_passwordless_acceptable_aaguids: [],
+    web_authn_policy_passwordless_extra_origins: []
   }
 
   describe 'otp_policy_digits' do
@@ -219,6 +221,7 @@ describe Puppet::Type.type(:keycloak_realm) do
       :smtp_server_reply_to,
       :smtp_server_reply_to_display_name,
       :default_locale,
+      :password_policy,
       :web_authn_policy_rp_entity_name,
       :web_authn_policy_rp_id,
       :web_authn_policy_passwordless_rp_entity_name,
@@ -348,8 +351,10 @@ describe Puppet::Type.type(:keycloak_realm) do
       :roles,
       :web_authn_policy_signature_algorithms,
       :web_authn_policy_acceptable_aaguids,
+      :web_authn_policy_extra_origins,
       :web_authn_policy_passwordless_signature_algorithms,
-      :web_authn_policy_passwordless_acceptable_aaguids
+      :web_authn_policy_passwordless_acceptable_aaguids,
+      :web_authn_policy_passwordless_extra_origins
     ].each do |p|
       it "accepts array for #{p}" do
         config[p] = ['foo', 'bar']
